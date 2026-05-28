@@ -139,8 +139,9 @@ td.mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
   width: 60mm; height: 60mm;
   background: white; color: black;
   border: 1px solid #ccc;
-  padding: 3mm;
+  padding: 2.5mm;
   display: flex; flex-direction: column;
+  align-items: center;
   font-family: 'Space Grotesk', sans-serif;
   page-break-after: always;
   page-break-inside: avoid;
@@ -148,34 +149,42 @@ td.mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
   box-sizing: border-box;
 }
 .label-header {
-  display: flex; justify-content: space-between; align-items: center;
-  border-bottom: 1px solid #000; padding-bottom: 1mm; margin-bottom: 1.5mm;
+  width: 100%;
+  display: flex; justify-content: center; align-items: center;
+  margin-bottom: 1mm;
   flex-shrink: 0;
 }
-.label-header .brand { font-weight: 700; font-size: 7pt; letter-spacing: 0.05em; }
-.label-header .loc {
-  font-family: 'JetBrains Mono', monospace;
-  font-weight: 700; font-size: 10pt;
-  background: #000; color: #fff;
-  padding: 0.5mm 2mm;
-}
+.label-header .brand { font-weight: 700; font-size: 6pt; letter-spacing: 0.1em; color: #555; }
+.label-qr { flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 22mm; height: 22mm; }
+.label-qr canvas, .label-qr img { width: 22mm !important; height: 22mm !important; display: block; }
 .label-info {
   display: flex; flex-direction: column;
-  gap: 1mm; overflow: hidden;
-  flex: 1; min-width: 0; justify-content: center;
+  align-items: center;
+  gap: 0.5mm; overflow: hidden;
+  flex: 1; min-width: 0; width: 100%;
+  justify-content: center;
+  text-align: center;
 }
-.label-info .code { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 11pt; line-height: 1.15; overflow-wrap: anywhere; }
-.label-info .name { font-size: 9pt; line-height: 1.2; word-wrap: break-word; overflow: hidden; }
-.label-mid { display: flex; gap: 2.5mm; align-items: center; flex: 1; min-height: 0; }
-.label-qr { flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 26mm; }
-.label-qr canvas, .label-qr img { width: 26mm !important; height: 26mm !important; display: block; }
+.label-info .code {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700; line-height: 1.1;
+  white-space: nowrap;
+}
+.label-info .loc-line {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700; font-size: 11pt; line-height: 1.1;
+  background: #000; color: #fff;
+  padding: 0.5mm 2.5mm;
+  margin: 0.5mm 0;
+}
+.label-info .name { font-size: 8pt; line-height: 1.15; word-wrap: break-word; overflow: hidden; }
 
-/* Lagerplatsetikett 60x60mm – stor läsbar text + mindre QR */
+/* Lagerplatsetikett 60x60mm – maximal läsbar text */
 .location-label {
   width: 60mm; height: 60mm;
   background: white; color: black;
   border: 1px solid #ccc;
-  padding: 3mm;
+  padding: 2.5mm;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   gap: 2mm;
@@ -185,19 +194,18 @@ td.mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
   overflow: hidden;
   box-sizing: border-box;
 }
-.location-label .ll-qr { display: flex; align-items: center; justify-content: center; }
+.location-label .ll-qr { flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
 .location-label .ll-qr canvas, .location-label .ll-qr img {
-  width: 26mm !important; height: 26mm !important; display: block;
+  width: 22mm !important; height: 22mm !important; display: block;
 }
 .location-label .ll-loc {
   font-family: 'JetBrains Mono', monospace;
   font-weight: 700;
-  font-size: 22pt;
-  background: #000; color: #fff;
-  padding: 2mm 5mm;
-  letter-spacing: 0.05em;
+  line-height: 1.05;
+  color: #000;
   text-align: center;
   white-space: nowrap;
+  width: 100%;
 }
 
 .print-toolbar { background: var(--panel); border: 1px solid var(--border); padding: 16px; margin-bottom: 20px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
@@ -655,34 +663,79 @@ document.getElementById('modal-cancel').addEventListener('click', closeModal);
 document.getElementById('modal-confirm').addEventListener('click', () => { if (modalConfirmHandler) modalConfirmHandler(); });
 modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
 
+// Koppla Enter-navigering mellan en lista av fält-id:n.
+// Enter (eller en scanners return) i ett fält hoppar till nästa.
+// Enter i sista fältet kör submitFn (= "Bekräfta"-knappen).
+// Streckkodsläsare skickar tecken + Enter mycket snabbt; vi behandlar Enter
+// som "gå vidare" oavsett hur texten kom in.
+function enableFieldFlow(fieldIds, submitFn) {
+  fieldIds.forEach((id, index) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('keydown', e => {
+      if (e.key !== 'Enter') return;
+      // Om autocomplete har ett aktivt val (via piltangenter), låt dess egen
+      // Enter-hantering välja förslaget – gå inte vidare här.
+      const acResults = el.parentElement && el.parentElement.querySelector('.autocomplete-results');
+      if (acResults && acResults.classList.contains('show') && acResults.querySelector('.ac-item.selected')) {
+        return;
+      }
+      e.preventDefault();
+      // Stäng eventuell öppen autocomplete-lista (scanner skrev exakt kod)
+      if (acResults) acResults.classList.remove('show');
+      const isLast = index === fieldIds.length - 1;
+      if (isLast) {
+        submitFn();
+      } else {
+        for (let j = index + 1; j < fieldIds.length; j++) {
+          const next = document.getElementById(fieldIds[j]);
+          if (next && next.offsetParent !== null) { next.focus(); if (next.select) next.select(); break; }
+        }
+      }
+    });
+  });
+}
+
 // ============ OPERATIONS: ADD ============
-function openAddDialog() {
+// prefill = { location, keepOpen } för kontinuerligt scanner-flöde
+function openAddDialog(prefill = {}) {
   const html = `
     <div class="field">
-      <label>Materialkod</label>
-      <input type="text" id="add-code" placeholder="Sök materialkod eller namn..." autocomplete="off">
+      <label>Materialkod <span style="color:var(--text-faint);font-weight:400;text-transform:none;letter-spacing:0;">(scanna eller skriv, Enter går vidare)</span></label>
+      <input type="text" id="add-code" placeholder="Scanna streckkod eller sök..." autocomplete="off">
       <div class="help" id="add-name-display">Börja skriva för att söka</div>
     </div>
     <div class="field">
       <label>Lagerplats</label>
-      <input type="text" id="add-location" placeholder="t.ex. A-1-01" autocomplete="off">
-      <div class="help">Format: Zon-Hylla-Plats</div>
+      <input type="text" id="add-location" placeholder="t.ex. A-1-01" autocomplete="off" value="${prefill.location ? escapeHtml(prefill.location) : ''}">
+      <div class="help">Format: Zon-Hylla-Plats · scanna platsetikett eller skriv</div>
     </div>
     <div class="field">
       <label>Antal</label>
       <input type="number" id="add-qty" min="1" step="1" value="1">
     </div>
+    <div class="field" style="margin-bottom:0;">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;text-transform:none;letter-spacing:0;font-size:13px;color:var(--text);">
+        <input type="checkbox" id="add-keepopen" ${prefill.keepOpen !== false ? 'checked' : ''} style="width:auto;">
+        Fortsätt lägga till efter sparande (behåller lagerplats)
+      </label>
+    </div>
   `;
-  openModal('Lägg till artikel på lager', html, async () => {
+  const submit = async () => {
     const code = document.getElementById('add-code').value.trim();
-    const location = parseLocation(document.getElementById('add-location').value);
+    const locationStr = document.getElementById('add-location').value;
+    const location = parseLocation(locationStr);
     const qty = parseInt(document.getElementById('add-qty').value);
-    if (!code) { toast('Materialkod saknas', 'error'); return; }
-    if (!location) { toast('Lagerplats ogiltig — använd format Zon-Hylla-Plats', 'error'); return; }
+    const keepOpen = document.getElementById('add-keepopen').checked;
+    if (!code) { toast('Materialkod saknas', 'error'); document.getElementById('add-code').focus(); return; }
+    if (!location) { toast('Lagerplats ogiltig — format Zon-Hylla-Plats', 'error'); document.getElementById('add-location').focus(); return; }
     if (!qty || qty < 1) { toast('Antal måste vara minst 1', 'error'); return; }
     const article = findArticle(code);
     if (!article) {
-      if (!confirm(`Materialkoden "${code}" finns inte i artikellistan. Lägg till ändå som okänd artikel?`)) return;
+      if (!confirm(`Materialkoden "${code}" finns inte i artikellistan. Lägg till ändå som okänd artikel?`)) {
+        document.getElementById('add-code').focus(); document.getElementById('add-code').select();
+        return;
+      }
     }
     const existing = stockData.find(s => s.code === code && formatLocation(s.location) === formatLocation(location));
     await withSync(async () => {
@@ -700,8 +753,14 @@ function openAddDialog() {
         await postHistory({type:'add', code, name: item.name, location: formatLocation(location), qty, note: 'Ny lagerpost'});
       }
     }, `Lade till ${qty} st ${code}`);
-    closeModal();
-  }, 'Lägg till');
+    if (keepOpen) {
+      // Öppna en ny tom rad direkt, behåll lagerplatsen → minimalt klickande
+      openAddDialog({ location: locationStr.trim(), keepOpen: true });
+    } else {
+      closeModal();
+    }
+  };
+  openModal('Lägg till artikel på lager', html, submit, 'Lägg till');
 
   setTimeout(() => {
     const inp = document.getElementById('add-code');
@@ -712,6 +771,9 @@ function openAddDialog() {
       const a = findArticle(inp.value.trim());
       document.getElementById('add-name-display').textContent = a ? (a.name + ' · ' + formatPrice(a.price)) : 'Okänd materialkod';
     });
+    enableFieldFlow(['add-code', 'add-location', 'add-qty'], submit);
+    // Om lagerplats redan ifylld (fortsätt-läge): börja direkt på materialkod ändå,
+    // eftersom platsen oftast är samma och koden är det som ändras
     inp.focus();
   }, 50);
 }
@@ -729,7 +791,7 @@ function openRemoveDialog(stockId=null) {
     <div class="field"><label>Antal att ta bort</label><input type="number" id="rm-qty" min="1" step="1" value="1"></div>
     <div class="field"><label>Anledning (valfritt)</label><input type="text" id="rm-note" placeholder="t.ex. Uttag till verkstad..."></div>
   `;
-  openModal('Ta bort från lager', html, async () => {
+  const submit = async () => {
     const id = document.getElementById('rm-id').value;
     const qty = parseInt(document.getElementById('rm-qty').value);
     const note = document.getElementById('rm-note').value.trim();
@@ -744,7 +806,9 @@ function openRemoveDialog(stockId=null) {
       await postHistory({type:'remove', code: s.code, name: s.name, location: formatLocation(s.location), qty: -qty, note: note || 'Uttag'});
     }, `Tog bort ${qty} st ${s.code}`);
     closeModal();
-  }, 'Ta bort');
+  };
+  openModal('Ta bort från lager', html, submit, 'Ta bort');
+  setTimeout(() => enableFieldFlow(['rm-id', 'rm-qty', 'rm-note'], submit), 50);
 }
 
 function openMoveDialog(stockId=null) {
@@ -764,7 +828,7 @@ function openMoveDialog(stockId=null) {
       <div class="help">Format: Zon-Hylla-Plats</div>
     </div>
   `;
-  openModal('Flytta lagerplats', html, async () => {
+  const submit = async () => {
     const id = document.getElementById('mv-id').value;
     const qty = parseInt(document.getElementById('mv-qty').value);
     const newLoc = parseLocation(document.getElementById('mv-location').value);
@@ -789,7 +853,9 @@ function openMoveDialog(stockId=null) {
       await postHistory({type:'move', code: s.code, name: s.name, location: `${oldLocStr} → ${formatLocation(newLoc)}`, qty, note: `Flyttat ${qty} st`});
     }, `Flyttade ${qty} st ${s.code}`);
     closeModal();
-  }, 'Flytta');
+  };
+  openModal('Flytta lagerplats', html, submit, 'Flytta');
+  setTimeout(() => enableFieldFlow(['mv-id', 'mv-qty', 'mv-location'], submit), 50);
 }
 
 function openAdjustDialog(stockId=null) {
@@ -805,7 +871,7 @@ function openAdjustDialog(stockId=null) {
     <div class="field"><label>Inventerat antal (nytt saldo)</label><input type="number" id="adj-qty" min="0" step="1" value="${selected ? selected.qty : 0}"></div>
     <div class="field"><label>Anledning</label><input type="text" id="adj-note" placeholder="t.ex. Inventering..."></div>
   `;
-  openModal('Justera antal (inventering)', html, async () => {
+  const submit = async () => {
     const id = document.getElementById('adj-id').value;
     const newQty = parseInt(document.getElementById('adj-qty').value);
     const note = document.getElementById('adj-note').value.trim();
@@ -819,7 +885,9 @@ function openAdjustDialog(stockId=null) {
       await postHistory({type:'adjust', code: s.code, name: s.name, location: formatLocation(s.location), qty: diff, note: `${note || 'Inventering'}: ${s.qty} → ${newQty}`});
     }, `Justerade ${s.code} till ${newQty} st`);
     closeModal();
-  }, 'Spara');
+  };
+  openModal('Justera antal (inventering)', html, submit, 'Spara');
+  setTimeout(() => enableFieldFlow(['adj-id', 'adj-qty', 'adj-note'], submit), 50);
 }
 
 function quickPrintLabel(id) {
@@ -951,7 +1019,7 @@ document.getElementById('btn-add-manual-label').addEventListener('click', () => 
     </div>
     <div class="field"><label>Antal etiketter</label><input type="number" id="ml-count" value="1" min="1" max="50"></div>
   `;
-  openModal('Lägg till artikeletikett manuellt', html, () => {
+  const submit = () => {
     const code = document.getElementById('ml-code').value.trim();
     const loc = parseLocation(document.getElementById('ml-location').value);
     const count = parseInt(document.getElementById('ml-count').value);
@@ -967,12 +1035,14 @@ document.getElementById('btn-add-manual-label').addEventListener('click', () => 
     renderLabelSource();
     renderLocationLabelSource();
     closeModal();
-  }, 'Lägg till');
+  };
+  openModal('Lägg till artikeletikett manuellt', html, submit, 'Lägg till');
   setTimeout(() => {
     const inp = document.getElementById('ml-code');
     articleAutocomplete(inp, a => {
       document.getElementById('ml-name').textContent = a.name + ' · ' + formatPrice(a.price);
     });
+    enableFieldFlow(['ml-code', 'ml-location', 'ml-count'], submit);
     inp.focus();
   }, 50);
 });
@@ -1245,7 +1315,7 @@ function previewLabels() {
       return `
         <div class="location-label">
           <div class="ll-qr" id="qr-${idx}"></div>
-          <div class="ll-loc">${escapeHtml(l.location)}</div>
+          <div class="ll-loc" data-fit="location">${escapeHtml(l.location)}</div>
         </div>
       `;
     }
@@ -1253,14 +1323,12 @@ function previewLabels() {
       <div class="label">
         <div class="label-header">
           <div class="brand">EV-SPECIALISTEN</div>
-          <div class="loc">${escapeHtml(l.location)}</div>
         </div>
-        <div class="label-mid">
-          <div class="label-info">
-            <div class="code">${escapeHtml(l.code)}</div>
-            <div class="name">${escapeHtml(l.name)}</div>
-          </div>
-          <div class="label-qr" id="qr-${idx}"></div>
+        <div class="label-qr" id="qr-${idx}"></div>
+        <div class="label-info">
+          <div class="code" data-fit="code">${escapeHtml(l.code)}</div>
+          <div class="loc-line">${escapeHtml(l.location)}</div>
+          <div class="name">${escapeHtml(l.name)}</div>
         </div>
       </div>
     `;
@@ -1269,10 +1337,8 @@ function previewLabels() {
     const qrEl = document.getElementById('qr-' + idx);
     qrEl.innerHTML = '';
     try {
-      const qrText = l.kind === 'location'
-        ? JSON.stringify({type: 'location', l: l.location})
-        : JSON.stringify({c: l.code, l: l.location});
-      const qrSize = l.kind === 'location' ? 140 : 120;
+      const qrText = l.kind === 'location' ? l.location : l.code;
+      const qrSize = 160;
       new QRCode(qrEl, {
         text: qrText,
         width: qrSize, height: qrSize,
@@ -1280,8 +1346,33 @@ function previewLabels() {
       });
     } catch(e) { console.error('QR fail', e); }
   });
+  // Anpassa textstorlek så den fyller bredden men inte svämmar över
+  requestAnimationFrame(() => {
+    preview.querySelectorAll('[data-fit]').forEach(el => fitText(el));
+  });
   section.style.display = 'block';
   return labels.length;
+}
+
+// Skala upp textstorleken tills den nästan fyller containerns bredd
+function fitText(el) {
+  const parent = el.parentElement;
+  if (!parent) return;
+  const maxWidth = parent.clientWidth - 2;
+  const isLocation = el.dataset.fit === 'location';
+  let size = isLocation ? 10 : 8;     // startstorlek i pt
+  const maxSize = isLocation ? 40 : 20;
+  el.style.fontSize = size + 'pt';
+  // Öka stegvis tills texten skulle bli för bred
+  while (size < maxSize && el.scrollWidth <= maxWidth) {
+    size += 0.5;
+    el.style.fontSize = size + 'pt';
+  }
+  // Backa ett steg så vi garanterat får plats
+  while (size > 6 && el.scrollWidth > maxWidth) {
+    size -= 0.5;
+    el.style.fontSize = size + 'pt';
+  }
 }
 
 document.getElementById('btn-print-labels').addEventListener('click', () => {
