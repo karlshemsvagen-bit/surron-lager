@@ -132,7 +132,7 @@ td.mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
 .ac-item .ac-code { font-family: 'JetBrains Mono', monospace; color: var(--accent); font-size: 11px; }
 .ac-item .ac-name { color: var(--text-dim); display: block; margin-top: 2px; }
 
-.label-print-area { display: grid; grid-template-columns: repeat(auto-fill, 60mm); gap: 6mm; justify-content: center; }
+.label-print-area { display: flex; flex-wrap: wrap; gap: 6mm; justify-content: center; }
 
 /* Artikeletikett 60x60mm */
 .label {
@@ -141,6 +141,7 @@ td.mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
   border: 1px solid #ccc;
   padding: 2.5mm;
   display: flex; flex-direction: column;
+  align-items: center;
   font-family: 'Space Grotesk', sans-serif;
   page-break-after: always;
   page-break-inside: avoid;
@@ -148,60 +149,65 @@ td.mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
   box-sizing: border-box;
 }
 .label-header {
-  display: flex; justify-content: space-between; align-items: center;
-  border-bottom: 1px solid #000; padding-bottom: 0.8mm; margin-bottom: 1.2mm;
+  width: 100%;
+  display: flex; justify-content: center; align-items: center; gap: 2mm;
+  margin-bottom: 1mm;
   flex-shrink: 0;
 }
-.label-header .brand { font-weight: 700; font-size: 6pt; letter-spacing: 0.05em; }
-.label-header .loc {
-  font-family: 'JetBrains Mono', monospace;
-  font-weight: 700; font-size: 8pt;
-  background: #000; color: #fff;
-  padding: 0.3mm 1.5mm;
-}
+.label-header .label-logo { height: 7mm; width: auto; display: block; max-width: 100%; object-fit: contain; }
+.label-header .brand { font-weight: 700; font-size: 6pt; letter-spacing: 0.1em; color: #555; display: none; }
+.label-qr { flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 22mm; height: 22mm; }
+.label-qr canvas, .label-qr img { width: 22mm !important; height: 22mm !important; display: block; }
 .label-info {
   display: flex; flex-direction: column;
+  align-items: center;
   gap: 0.5mm; overflow: hidden;
-  flex: 1; min-width: 0;
+  flex: 1; min-width: 0; width: 100%;
+  justify-content: center;
+  text-align: center;
 }
-.label-info .code { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 7.5pt; line-height: 1.1; overflow-wrap: anywhere; }
-.label-info .name { font-size: 6.5pt; line-height: 1.15; word-wrap: break-word; max-height: 5em; overflow: hidden; }
-.label-mid { display: flex; gap: 2mm; align-items: center; flex: 1; min-height: 0; }
-.label-qr { flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 22mm; }
-.label-qr canvas, .label-qr img { width: 22mm !important; height: 22mm !important; display: block; }
-.label-barcode { width: 100%; text-align: center; flex-shrink: 0; margin-top: 1mm; }
-.label-barcode svg { width: 100%; max-height: 7mm; }
+.label-info .code {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700; line-height: 1.1;
+  white-space: nowrap;
+}
+.label-info .loc-line {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700; font-size: 11pt; line-height: 1.1;
+  background: #000; color: #fff;
+  padding: 0.5mm 2.5mm;
+  margin: 0.5mm 0;
+}
+.label-info .name { font-weight: 600; line-height: 1.1; white-space: nowrap; }
 
-/* Lagerplatsetikett 60x60mm – QR-fokuserad */
+/* Lagerplatsetikett 102x17mm liggande – QR vänster, stor text höger */
 .location-label {
-  width: 60mm; height: 60mm;
+  width: 102mm; height: 17mm;
   background: white; color: black;
   border: 1px solid #ccc;
-  padding: 3mm;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: space-between;
+  padding: 1mm;
+  display: flex; flex-direction: row;
+  align-items: center; justify-content: flex-start;
+  gap: 2mm;
   font-family: 'Space Grotesk', sans-serif;
   page-break-after: always;
   page-break-inside: avoid;
   overflow: hidden;
   box-sizing: border-box;
 }
-.location-label .ll-brand {
-  font-weight: 700; font-size: 6pt;
-  letter-spacing: 0.1em;
-  color: #555;
-}
-.location-label .ll-qr { flex: 1; display: flex; align-items: center; justify-content: center; }
+.location-label .ll-qr { flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
 .location-label .ll-qr canvas, .location-label .ll-qr img {
-  width: 38mm !important; height: 38mm !important; display: block;
+  width: 15mm !important; height: 15mm !important; display: block;
 }
 .location-label .ll-loc {
   font-family: 'JetBrains Mono', monospace;
   font-weight: 700;
-  font-size: 16pt;
-  background: #000; color: #fff;
-  padding: 1mm 4mm;
-  letter-spacing: 0.05em;
+  line-height: 1;
+  color: #000;
+  text-align: center;
+  white-space: nowrap;
+  flex: 1; min-width: 0;
+  padding: 0 2mm;
 }
 
 .print-toolbar { background: var(--panel); border: 1px solid var(--border); padding: 16px; margin-bottom: 20px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
@@ -226,7 +232,6 @@ td.mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
 .history-action { font-weight: 600; text-transform: uppercase; font-size: 10px; letter-spacing: 0.1em; }
 
 @media print {
-  @page { size: 60mm 60mm; margin: 0; }
   header, .toolbar, .print-toolbar, .toast-container { display: none !important; }
   body { background: white; margin: 0; padding: 0; }
   main { padding: 0; max-width: none; }
@@ -416,6 +421,9 @@ td.mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
 <script>
 const ARTICLES = [{"code":"41100-YQ2B-0000-Y4","name":"Frame Assy. (Black)","price":14706.090000000002},{"code":"61000-YQ2A-0000-Y4","name":"Swingarm Assy (Black)","price":7858.965},{"code":"41520-YQ2A-0000","name":"Subframe Assy.","price":3772.545},{"code":"B1-009-08-020-F0","name":"Screw (M8*20)","price":6.045},{"code":"41151-YQ2A-0000","name":"Frame/Swingarm bushing","price":23.25},{"code":"B2-013-10-F0","name":"Nut B2013 M10*1.0","price":52.08000000000001},{"code":"61260-YQ2A-0000","name":"Swingarm pivot shaft","price":288.76500000000004},{"code":"B4-001-10-F2","name":"Washer (Φ10-Φ20-2)","price":4.65},{"code":"41115-YQ2A-Z","name":"Light Bee Reinforced Riser Clamp Assy","price":511.50000000000006},{"code":"FB05-005-10-15-22-2","name":"Washer FB05005 Φ10*Φ15*Φ22-2","price":4.65},{"code":"B3-002-05-010-F0","name":"Screw B3002 M5*10","price":4.65},{"code":"Z-6000-2RS-26-10-08","name":"Swingarm pivot bearing","price":159.03},{"code":"32120-YQ2A-0000","name":"Mid. Shaft Guard (Plastic)","price":172.98000000000002},{"code":"B2-001-06-F2","name":"Nut B2001 M6","price":4.65},{"code":"B1-004-06-035-F0","name":"Bolt B1004 M6*35","price":4.65},{"code":"61210-YQ2A-0000","name":"Tensioner","price":139.03500000000003},{"code":"B4-001-06-F2","name":"Midshaft washer","price":4.65},{"code":"81138-YQ2A-0000","name":"Nylon clip81138","price":4.65},{"code":"32223-YQ2A-0000","name":"Chain Guide","price":233.895},{"code":"FB03-001-06-012-F0","name":"Screw FB03001 M6*12","price":9.3},{"code":"31311-YQ1N-0000","name":"Rear Tire Hugger","price":233.895},{"code":"B4-001-05-F0","name":"Washer B4001 Φ5","price":4.65},{"code":"B2-018-05-010-F0","name":"Cap Nut B2018 M5*10","price":4.65},{"code":"61237-YQ2A-0000","name":"Swingarm protection Block","price":52.08000000000001},{"code":"61238-YQ2A-0000","name":"Flanged Bushing","price":13.95},{"code":"B3-002-05-012-F0","name":"Screw B3002  M5*12","price":4.65},{"code":"B3-001-05-030-F0","name":"Screw B3001 M5*30","price":4.65},{"code":"31218-YQ2B-0000","name":"Front Fender Bushing","price":16.275},{"code":"31211-YQ2B-0000","name":"Front Fender (KKE)","price":333.405},{"code":"FB03-001-06-016-F0","name":"Screw FB03001 M6*16","price":4.65},{"code":"26000-Y029A-0000","name":"60V40Ah Lithium Battery Pack (GW)","price":34875.00000000001},{"code":"24110-Y029A-0100","name":"Battery Power Cable Transfer Cable","price":664.95},{"code":"26290-YQ2A-0000","name":"Battery cap Lock Hook","price":58.59000000000001},{"code":"32233-YQ2A-0000","name":"Battery Compartment Cover rubber bumper","price":103.69500000000001},{"code":"32231-YQ2A-0000","name":" Battery Compartment Cover","price":333.87},{"code":"B3-002-06-012-F0","name":"Screw B3002  M6*12","price":4.65},{"code":"41762-YQ2A-0000","name":"Battery Compartment Cover  pivot pin","price":32.55},{"code":"32354-YQ2A-0000","name":"Battery Rear Support Plate","price":163.215},{"code":"41690-YQ2A-0000","name":"Battery Bottom Support Plate","price":313.41},{"code":"B3-001-06-010-F0","name":"Screw B3001 M6*10","price":4.65},{"code":"B4-009-06-014-F0","name":"Motor Position Adjuster Limitation Pin M6*14","price":4.65},{"code":"FB02-003-08-F2","name":"Nut Clip M8","price":4.65},{"code":"41750-YQ2A-0000","name":"Skid plate","price":617.985},{"code":"41740-YQ2A-0000","name":"Controller Lower Right Bracket","price":117.18000000000002},{"code":"41730-YQ2A-0000","name":"Controller Lower Left Bracket","price":117.18000000000002},{"code":"B3-002-06-010-F0","name":"Screw B3002 M6*10","price":4.65},{"code":"B4-002-06-F2","name":"Washer B4002 d6","price":4.65},{"code":"B3-001-06-012-F0","name":"Screw B3001 M6*12","price":4.65},{"code":"41710-YQ2A-0000","name":"Controller Upper Bracket","price":119.04000000000002},{"code":"41670-YQ2A-0001","name":"Battery Front Plate","price":383.16},{"code":"FB02-001-06-F2","name":"Clipmutter FB02001 M6","price":4.65},{"code":"B3-001-06-020-F0","name":"Screw B3001 M6*20","price":4.65},{"code":"41755-YQ2A-0000","name":"Motor Protection Block","price":50.22000000000001},{"code":"51290-YQ2A-0100","name":"Front Wheel Inside Spokes(216×8)","price":19.53},{"code":"51290-YQ2A-0300","name":"Front Wheel Outside Spokes(216×8.2)","price":19.53},{"code":"52171-YQ2A-0001","name":"Front Brake Disc","price":325.50000000000006},{"code":"FB03-006-05-010-F3","name":"Screw FB03006 M5*10","price":4.65},{"code":"51200-YQ2A-Z2","name":"Front Wheel Assy.With Break Disc + Off Road Tire (E-Mark)","price":5000.145},{"code":"51350-YQ2B-0000","name":"LBL1E Rear Wheel axle","price":256.68},{"code":"51362-YQ2A-0000","name":"Rear Wheel Step Bushing Left","price":192.51000000000002},{"code":"52280-YQ2A-0000","name":"Rear Brake Clipper Bracket","price":404.08500000000004},{"code":"FB03-006-06-013-F3","name":"Screw FB03006 M6*13","price":4.65},{"code":"52271-YQ2A-0001","name":"Rear Brake Disc","price":325.50000000000006},{"code":"51310-YQ2A-0000","name":"Rear Wheel Hub Assy.","price":2366.385},{"code":"51390-YQ2A-0100","name":"Rear Wheel Inside Spokes(212×8)","price":14.415},{"code":"51390-YQ2A-0200","name":"Rear Wheel Outside Spokes(212×8.6)","price":14.415},{"code":"13204-YQ2A-0000","name":"Sprocket (48T)","price":1003.4699999999999},{"code":"B3-001-08-016-F0","name":"Screw B3001  M8*16","price":5.58},{"code":"51361-YQ2A-0000","name":"Rear Wheel Step Bushing Right","price":160.425},{"code":"B2-007-12-F2","name":"Nut B2007 M12*1.25","price":9.3},{"code":"51370-YQ2A-Z2","name":"Rear  Wheel Assy. + Off Road Tire (E-Mark)","price":5867.370000000001},{"code":"23200-YQ2B-0100","name":"LBL1J Sport/Eco Switch Assy.\n（with hazard warning signal）","price":744.0},{"code":"B3-003-05-016-F0","name":"Screw B3003 M5*16","price":4.65},{"code":"27000-YQ2B-0100","name":"Key Switch Set","price":639.84},{"code":"24601-YQ2A-0000","name":"USB Cap","price":27.9},{"code":"24600-YQ2A-0000","name":"USB Port","price":232.5},{"code":"B2-006-06-F2","name":"Nut B2006 M6","price":4.65},{"code":"29310-NM1A-0000","name":"Horn","price":138.57000000000002},{"code":"B1-008-06-020-F2","name":"Screw B1008 M6*20","price":4.65},{"code":"FB01-003-06-016-F2","name":"Screw FB01003 M6*16","price":4.65},{"code":"23400-YQ2A-0000","name":"Side Stand Switch Assy.","price":379.44000000000005},{"code":"21300-YQ2A-0000","name":"DC Converter Assy-60V/12V-5A.","price":363.63000000000005},{"code":"FB03-003-04-013-F3","name":"Screw FB03003 M4*13","price":4.65},{"code":"52200-YQ2F-0000","name":"Rear Hydraulic Disc Brake System","price":2783.025},{"code":"52100-YQ2F-0000","name":"Front Hydraulic Disc Brake System","price":2663.5200000000004},{"code":"13114-YQ2A-0600","name":"O-Ring  Chain (420-106 Links)","price":680.2950000000001},{"code":"13114-YQ2A-0700","name":"O-Ring  Chain (112 links)","price":718.425},{"code":"61234-YQ2A-0001","name":"Mid. Shaft R Bushing","price":31.155000000000005},{"code":"B3-001-06-025-F0","name":"Screw B3001 M6*25","price":9.3},{"code":"B7-001-15-24-07","name":"Mid. Shaft R Oil Seal (Φ15-Φ24-7)","price":33.945},{"code":"13105-YQ2A-0000","name":"Secondary Drive Front Sprocket (14T)","price":191.58},{"code":"61280-YQ2A-0001","name":"Mid. Shaft Assy.","price":1051.8300000000002},{"code":"Z-6000-2Z-26-10-08","name":"Mid. Shaft  Bearing","price":159.03},{"code":"61282-YQ2A-0000","name":"Mid. Shaft  Inner Bushing","price":46.035000000000004},{"code":"B7-001-15-26-6","name":"Mid. Shaft L Oil Seal (Φ15-Φ26-6)","price":33.945},{"code":"13202-YQ2A-0200","name":"Primary Drive Rear Pulley","price":0.0},{"code":"13202-YQ2A-0400","name":"Primary Drive Rear Pulley","price":1039.74},{"code":"61233-YQ2A-0001","name":"Mid. Shaft L Bushing","price":92.53500000000001},{"code":"B3-001-06-016-F0","name":"Screw (M6*16)","price":4.65},{"code":"13111-YQ2A-0100","name":"Primary Belt(Continental)","price":1036.0200000000002},{"code":"13111-YQ2A-0400","name":"Primary Belt(GATES)","price":1036.0200000000002},{"code":"13211-YQ2A-0000","name":"Primary Transmission Sprocket (13T)","price":217.15500000000003},{"code":"13212-YQ2A-0000","name":"Primary Transmission Sprocket (30T)","price":541.725},{"code":"13117-YQ2A-0000","name":"Primary Chain (420-42links)","price":109.27500000000002},{"code":"61270-YQ2A-Z1","name":"Mid. Shaft Assy. + Secondary Chain Drive Front Sprocket (14T)+ Primary Drive Rear Pulley","price":2351.505},{"code":"24100-YQ2B-0100","name":"LBL1E Main Cable Harness GPS (1210mm)","price":966.735},{"code":"22950-YQ2B-0100","name":"Flasher","price":256.21500000000003},{"code":"21250-YQ2A-0000","name":"Tilt Switch","price":491.97},{"code":"B2-008-03-F2","name":"Nut B2008 M3","price":4.65},{"code":"B4-001-04-F2","name":"Washer B4001 d4","price":4.65},{"code":"81153-NM1A-0000","name":"Nylon clip81153","price":4.65},{"code":"23500-YQ2A-0000","name":"Circuit Breaker","price":242.73},{"code":"81125-YQ2A-0100","name":"Nylon Washer （Φ7*Φ3.2*5）","price":4.65},{"code":"B3-001-03-035-F0","name":"Screw B3001 M3*35","price":4.65},{"code":"24110-YQ2A-0000","name":"Battery Accessional Line","price":1048.5750000000003},{"code":"24150-YQ2B-0000","name":"Tail Light cable Harness","price":391.995},{"code":"22920-NM1A-0000","name":"Rear Reflector","price":57.66},{"code":"22200-YQ2B-0000","name":"LBL1e Tail Light","price":526.845},{"code":"B4-010-06-F2","name":"Washer B4010 d6","price":4.65},{"code":"81181-YQ2A-0100","name":"Rear LOGO plate","price":45.105000000000004},{"code":"22400-YQ2B-0000","name":"Rear R Turn Signal","price":359.44500000000005},{"code":"41510-YQ2B-0000","name":"Turn Signal Bracket","price":29.295000000000005},{"code":"22300-YQ2B-0000","name":"Rear L Turn Signal","price":359.44500000000005},{"code":"32367-YQ2B-0000","name":"Tail Light Cover","price":104.16000000000003},{"code":"32366-YQ2B-0000","name":"Tail Light Stand","price":81.84},{"code":"81118-NM1A-0000","name":"Rear LOGO plate Buffer","price":11.16},{"code":"B2-015-06-F2","name":"Nut B2015 M6","price":4.65},{"code":"25100-YQ2B-0200","name":"LBL1E Dashboard","price":1924.6350000000002},{"code":"25111-YQ2B-0000","name":"LBL1E Dashboard Buffer","price":4.65},{"code":"41350-YQ2B-0000","name":"LBL1E Dashboard Bracket","price":301.785},{"code":"31130-YQ2B-0000","name":"LBL1E Dashboard Windshield","price":299.925},{"code":"B3-002-06-016-F0","name":"Screw B3002 M6*16","price":4.65},{"code":"41342-YQ2B-0000","name":"Headlight R Protection Plate","price":47.895},{"code":"41341-YQ2B-0000","name":"Headlight L Protection Plate","price":47.895},{"code":"22910-YQ2B-0000","name":"FRONT Side Reflector","price":32.55},{"code":"99100-YQ2B-0000","name":"LBL1E Standard Spare Parts Set","price":1416.8550000000002},{"code":"21100-YQ2B-0101","name":"Controller (Sine Wave) 45KM/H","price":15086.460000000003},{"code":"B8-001-06-016-F2","name":"Screw B8001 M6*16","price":4.65},{"code":"21103-YQ2A-0000","name":"Controller upper mud plate","price":67.42500000000001},{"code":"26351-YQ2A-0000","name":"Charging port cap","price":4.65},{"code":"21700-YQ2A-1200","name":"Charger (67.2V-10A 220V, 10A) (EU Plug)","price":5038.74},{"code":"26220-YQ2A-0100","name":"Battery BMS board (60V Battery)","price":3494.4750000000004},{"code":"11100-YQ2A-0201","name":"Motor  (3KW)","price":17097.120000000003},{"code":"B6-003-05-016","name":"Woodruff Key(5*5*16mm)","price":4.65},{"code":"B7-001-25-35-07","name":"Motor Shaft Seal","price":134.85000000000002},{"code":"13201-YQ2A-0400","name":"Primary pulley","price":346.89},{"code":"FB03-005-006-F2","name":"Screw PB3.5*6","price":4.65},{"code":"32332-YQ2A-0000","name":"Primary pulley inner plate","price":69.75},{"code":"32331-YQ2A-0000","name":"Primary pulley outer cover","price":89.28},{"code":"11216-YQ2A-0000","name":"Motor support Bushing","price":92.53500000000001},{"code":"B3-001-08-040-F0","name":"Screw B3001 M8*40","price":9.765},{"code":"11171-YQ2A-0000","name":"Motor Position Adjuster","price":129.26999999999998},{"code":"11172-YQ2A-0000","name":"Motor Position Adjuster Fix Pin","price":13.95},{"code":"B3-001-08-045-F0","name":"Screw B3001 M8*45","price":11.16},{"code":"B3-001-08-020-F0","name":"Screw B3001 M8*20","price":4.65},{"code":"B3-001-08-025-F0","name":"Screw B3001 M8*25","price":9.3},{"code":"FB05-002-23-12-1-F4","name":"Primary pulley Washer （Φ23*Φ12*1）","price":4.65},{"code":"21152-YQ2A-0000","name":"Hall Sensor","price":1079.73},{"code":"32340-YQ2A-0000","name":"key switch holder","price":57.66},{"code":"B3-003-05-010-F0","name":"Screw B3003 M5*10","price":4.65},{"code":"B4-007-05-F1","name":"E-Clip (Inner Dia. Φ5)","price":4.65},{"code":"32356-YQ2A-0000","name":"Battery L Positioning Block","price":65.1},{"code":"32357-YQ2A-0000","name":"Battery R Positioning Block","price":65.1},{"code":"32361-YQ2A-0000","name":"Controller Mud Guard","price":203.67000000000002},{"code":"32358-YQ2A-0000","name":"Battery Bottom Positioning Block","price":375.72},{"code":"B3-003-05-012-F0","name":"Screw B3003 M5*12","price":4.65},{"code":"26343-YQ2A-0000","name":"Battery bottom Buffer","price":32.55},{"code":"32365-YQ2A-0000","name":"Belt mudguard","price":79.98},{"code":"32353-YQ2A-0000","name":"Battery Front Positioning Block","price":65.1},{"code":"32355-YQ2A-0000","name":"Battery rear mud plate","price":235.29},{"code":"B2-012-05-F2","name":"Nut B2012 M5","price":4.65},{"code":"26341-YQ2A-0000","name":"Battery Front Buffer","price":32.55},{"code":"41670-YQ2A-0000","name":"41670-YQ2A-0001","price":383.16},{"code":"51350-YQ2A-0000","name":"LBX Rear Wheel axle","price":256.68},{"code":"51300-YQ2A-Z2","name":"Rear Wheel Assy + Rear Brake Disc + Sprocket（E-Mark）","price":7252.14},{"code":"22100-YQ2A-Z","name":"Head Light Assy. + Bracket","price":928.1400000000001},{"code":"41330-YQ2A-0200","name":"Head Light Assy Bracket","price":104.625},{"code":"B3-006-002-F1","name":"Screw B3006 ST2.9*9.5","price":4.65},{"code":"25100-YQ2A-0100","name":"LBX Dashboard","price":1436.85},{"code":"23200-YQ2A-0000","name":"LBX Sport/Eco Switch Assy","price":164.61},{"code":"27000-YQ2A-0100","name":"Key Switch Set(2P)","price":566.37},{"code":"41660-YQ2A-0000","name":"Tail Light Mounting Bracket","price":95.79},{"code":"22200-YQ2A-0000","name":"LBX Tail Light","price":310.62},{"code":"32300-YQ2F-0000","name":"Seat Assy.","price":513.36},{"code":"31321-YQ2A-0000","name":"Rear Mudguard (Plastic)","price":130.66500000000002},{"code":"31340-YQ2A-0000","name":"Rear Inner Mudguard (Plastic)","price":208.32000000000005},{"code":"B5-004-R5075","name":"Nylon rivet (R5075)","price":4.65},{"code":"B3-001-08-035-F7","name":"Bolt B3001 M8*35","price":8.370000000000001},{"code":"B4-001-08-F2","name":"Washer B4001 d8","price":4.65},{"code":"55163-YQ2A-0000","name":"Nylon Washer （Φ12-Φ20-2）","price":4.65},{"code":"55162-YQ2A-0000","name":"Connector Bushing","price":39.06},{"code":"Z-HK1212-16-12-12","name":"Rear Shock Linkage Connector Bearing","price":19.53},{"code":"55148-YQ2A-0000","name":"Rear Shock Control Arm","price":890.94},{"code":"FB03-018-08-056-043-F7","name":"Control Arm Bolt ( L56-M8)","price":9.3},{"code":"55140-YQ2A-0001","name":"Linkage Arm Assy.","price":890.94},{"code":"B2-006-08-F2","name":"Nut B2006 M8","price":4.65},{"code":"FB03-018-08-050-037-F7","name":"Screw FB03018 M8*50","price":9.3},{"code":"55110-YQ2A-0100","name":"Rear Shock Absorber 450lb (FAST)","price":3829.275},{"code":"55110-YQ2A-0500","name":"Rear Shock Absorber 450LB (KKE)","price":4094.7900000000004},{"code":"42110-YQ2A-Z1","name":"L Foot Pegs Assy.","price":672.8550000000001},{"code":"42210-YQ2A-Z1","name":"R Foot Pegs Assy.","price":672.8550000000001},{"code":"41550-YQ2A-Z2","name":"Side Stand Assy.+L Foot Peg Mounting Bracket","price":1175.055},{"code":"51180-YQ2A-Z1","name":"Tapered Roller Bearing Headset Assy.","price":914.6550000000002},{"code":"23810-YQ1A-0200","name":"L Hanldebar Grip （Black）","price":121.365},{"code":"23810-YQ1A-0100","name":"L Hanldebar Grip （Grey）","price":121.365},{"code":"51155-YQ2A-0000","name":"Handlebar Plug","price":4.65},{"code":"51150-YQ2A-0100","name":"Handlebar","price":502.6650000000001},{"code":"23910-YQ1A-0100","name":"Electric Throttle（Double hall）","price":651.0000000000001},{"code":"23820-YQ1A-0200","name":"R Handlebar Grip (Black)","price":121.365},{"code":"23820-YQ1A-0100","name":"R Handlebar Grip (Grey)","price":121.365},{"code":"51190-YQ2A-Z","name":"Stem Assy.","price":867.2249999999999},{"code":"51000-YQ2B-0200","name":"Front Fork Assy. (KKE)","price":14757.240000000002},{"code":"51250-YQ1A-0000","name":"Front Wheel Axle  （KKE）","price":794.22},{"code":"51250-YQ2A-0400","name":"Front Wheel Axle  （RST）","price":914.6550000000002},{"code":"51263-YQ2B-0100","name":"Front Wheel Axle Nut (FASTCE)","price":111.13500000000002},{"code":"51263-YQ1A-0000","name":"Front Wheel Axle Nut (KKE)","price":111.13500000000002},{"code":"52240-YQ2A-0000","name":"Rear Brake Hose","price":403.62},{"code":"52140-YQ2A-0000","name":"52140-YQ2A-0000","price":206.925},{"code":"24100-YQ2A-0200","name":"LBX Main Cable Harness   (1210mm)","price":966.735},{"code":"82120-YQ2F-0000","name":"Decal Set (Orange)","price":1169.0100000000002},{"code":"82120-YQ2F-Z2","name":"Decal Set (Green)","price":1169.0100000000002},{"code":"82136-YQ2A-0000","name":"Warning Label Set(EN)","price":65.1},{"code":"55171-YQ2A-0000","name":"Rear shock Adaptor","price":764.4600000000002},{"code":"51200-YQ2A-Z4","name":"Front SM Wheel Assy.","price":3938.55},{"code":"51300-YQ2A-Z4","name":"Rear SM Wheel Assy.","price":6139.86},{"code":"13114-YQ2A-0100","name":"Chain (420-102 links)","price":471.51000000000005},{"code":"82110-YQ2A-0000","name":"Light Bee Tool Kit (KKE/DNM)","price":139.03500000000003},{"code":"82140-YQ2A-0000","name":"Light Bee Tool Kit (FAST)","price":189.25500000000002},{"code":"0402140401","name":"4-Pin Spanner Socket(Swingarm pivot shaft nut remover)","price":477.09000000000003},{"code":"99100-YQ2A-0000","name":"66666666666666596487460697077266651008376879653567131686346472226065219584","price":1416.8550000000002}];
 
+// Surron-logo för etiketter (inbäddad som base64 från uppladdad logo.png)
+const SURRON_LOGO_SVG = '<img src="data:image/jpeg;base64,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dhBUix7XtDm5KiIixlyRERERERETmWuvHfpyXd31j+UtinMtdeO/Tku7vrH8pbQ7F3ls/sjrUVi3i29KshERbrUCiIiIiIiIiIiIiqBmgUodGPAnlvQt7XtJes7ItNpsZvs+IixQep4tad+87N8VjOM02EUxqKg9A3k8B/Ni7oIHzO1Wqui/gVyz5O9r1k/Wc2xabTorfZ7c2xYoPU8WtO/edm/AmLPTPujvvM/WuWyVns2/rBa2cWOmddHfeZ+tcqPoTjlTjOJVM852aosNwFzsH6nes+up2wRNa1WwiItmqKREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREUx/ucH5JefdNP/AKyJ9zg/JLz7pp/9ZERSJuT24DuF/wDEvXEuW5PbeO4X/wAS9cS866e+fZvu/KFZcO8nCIiKnLORERERVRR10msc22+yZs6zptrqu4GHPT0J2YlAd8Nh985z1Pb3SuDYPU4vUinpxt3ncBxP82rpnnbC3Wcq6TWObLfZMWdZs211XcDDnp6G7MSgO+Gw++c56nt7ofRHue8ve4uc45kk5klIj3RHue9xc5xzJJzJK+V6MwLAqbBaYQQDbvO8n+ZDcqzUVDp36zkV14S2r6dcQ6NbJiugwp2PlGiNG1kNoLnkdnVBy7OStRXThPdRsnEKjXMYTo0OSmM40Np2vhuBa8Ds6pOXZyUhXct2rJ2v4eqdXpts/FdcerrjWyWw+17fots0iDSqBTZenycJuq2HCYAXdlx3uJ4krgvq4pe0rPqlyTcvGmYFOlzGdBhZaz9oAA5tpG3gFy2tcVDuekQarQKnLT8nFbrNfDeCW9hzd7SOIKwtpcYmUSnWPOWXTZ6BOVip6sOYZBeHiWghwc7XI2BzsgA3flmSvN2F4bVYlijIJWucS4a173tfviTu2KzyysiiLmnoUXMTr6ruIFzxq3W4+bj6iXl2E8nLw89jGDm5zvJ2lcGHlm1y+blgUGhSxix4nqokR2yHAhje954NH79w2ph5Ztdvq5oFCoUryseL6qJEdshwGDe954NH79w2qe+EuHlDw5tltJpLOVmYoDp2dc3KJMvHE8zRwbw7eZW59I9JKXRylbT04HKWs1oyA4nm6/iVB0tK+pfrOy3lMJcO6HhzbTKVSoYizMQB07OvaBEm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tvGmhViuT0KQkIBjcrHi56rNaC9ozyB4kBSG6Btnwlv8S/bJ0DbPhLd4l+2WJSaPQ01BNQ8o5zZNa5JuRrCxts/hXJ0pc4OtksE6V9x0S6cYZyrW/UYNRkXSkvDbHg56pc1mRAzA3LzNGuuUm3MaberNcnYUjT5eJG5WPEz1Wa0F7RnkOcgeFSJ6Btnwlu8S/bJ0DbPhLd4l+2WZHhMTMN7nAnV1NS++1rX4XXEvJfrrBWlfcdEunGCbq1vVKDUZEykvDEeFnqlzWbQMwNyu7RMxjollS8/aF4OMKiz8UxoMyWGIyDEc0Ne17RmdRwA2gHIjbsOzI/QNs+Et3iX7ZOgbZ8JbvEv2yxptH6WfC24ZJcsaAAd+zI9PuXISuD9cLxKpZ2izRqm+5412NnZUO5VlIlp3l2OOeYYGNbr6vYLgOc5L2ahjvZt2YJ3nJR5iRoUw6XmJKk0o5iK6ByTRDOTRq5klwyGwZZcM19dA2z4S3eJftk6Btnwlv8S/bKKdobDPqOqp5JHMILS4jZY3sBa23ec+dcxUEeCAFDEoBmVM3oG4fwlu8S/bLIOFuiTYFpVaDVq1Nzd0TcBwfChzcNsOWa4dUYQz1tvBxI7BVyWOupoN2BO2jhW6u1WA6XnbinYUwyG9uTmyzARCJ/W1nO7RCKRM60NZAaAABGZkBw2oiKtM/J3/ALaL5bl2kREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREXWn90H9sz6URERf/Z" class="label-logo" alt="Surron">';
+
 // ============ STATE ============
 let stockData = [];
 let historyData = [];
@@ -489,6 +497,13 @@ async function withSync(fn, successMsg) {
 // ============ UTILS ============
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,9); }
 function formatLocation(loc) { if (!loc) return '—'; return `${loc.zone}-${loc.shelf}-${loc.bin}`; }
+function parseLocation(str) {
+  // Acceptera "A-1-01" eller "A 1 01" eller "A/1/01" – tar 3 segment
+  if (!str) return null;
+  const parts = String(str).trim().toUpperCase().split(/[-\s\/]+/).filter(Boolean);
+  if (parts.length !== 3) return null;
+  return { zone: parts[0], shelf: parts[1], bin: parts[2] };
+}
 function findArticle(code) { return ARTICLES.find(a => a.code === code); }
 function formatPrice(p) { return new Intl.NumberFormat('sv-SE', {minimumFractionDigits: 2, maximumFractionDigits: 2}).format(p) + ' kr'; }
 function formatTs(iso) {
@@ -652,41 +667,80 @@ document.getElementById('modal-cancel').addEventListener('click', closeModal);
 document.getElementById('modal-confirm').addEventListener('click', () => { if (modalConfirmHandler) modalConfirmHandler(); });
 modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
 
+// Koppla Enter-navigering mellan en lista av fält-id:n.
+// Enter (eller en scanners return) i ett fält hoppar till nästa.
+// Enter i sista fältet kör submitFn (= "Bekräfta"-knappen).
+// Streckkodsläsare skickar tecken + Enter mycket snabbt; vi behandlar Enter
+// som "gå vidare" oavsett hur texten kom in.
+function enableFieldFlow(fieldIds, submitFn) {
+  fieldIds.forEach((id, index) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('keydown', e => {
+      if (e.key !== 'Enter') return;
+      // Om autocomplete har ett aktivt val (via piltangenter), låt dess egen
+      // Enter-hantering välja förslaget – gå inte vidare här.
+      const acResults = el.parentElement && el.parentElement.querySelector('.autocomplete-results');
+      if (acResults && acResults.classList.contains('show') && acResults.querySelector('.ac-item.selected')) {
+        return;
+      }
+      e.preventDefault();
+      // Stäng eventuell öppen autocomplete-lista (scanner skrev exakt kod)
+      if (acResults) acResults.classList.remove('show');
+      const isLast = index === fieldIds.length - 1;
+      if (isLast) {
+        submitFn();
+      } else {
+        for (let j = index + 1; j < fieldIds.length; j++) {
+          const next = document.getElementById(fieldIds[j]);
+          if (next && next.offsetParent !== null) { next.focus(); if (next.select) next.select(); break; }
+        }
+      }
+    });
+  });
+}
+
 // ============ OPERATIONS: ADD ============
-function openAddDialog() {
+// prefill = { location, keepOpen } för kontinuerligt scanner-flöde
+function openAddDialog(prefill = {}) {
   const html = `
     <div class="field">
-      <label>Materialkod</label>
-      <input type="text" id="add-code" placeholder="Sök materialkod eller namn..." autocomplete="off">
+      <label>Materialkod <span style="color:var(--text-faint);font-weight:400;text-transform:none;letter-spacing:0;">(scanna eller skriv, Enter går vidare)</span></label>
+      <input type="text" id="add-code" placeholder="Scanna streckkod eller sök..." autocomplete="off">
       <div class="help" id="add-name-display">Börja skriva för att söka</div>
     </div>
     <div class="field">
-      <label>Lagerplats (Zon - Hylla - Plats)</label>
-      <div class="field-row">
-        <input type="text" id="add-zone" placeholder="Zon (t.ex. A)" maxlength="3">
-        <input type="text" id="add-shelf" placeholder="Hylla (t.ex. 02)" maxlength="3">
-        <input type="text" id="add-bin" placeholder="Plats (t.ex. 04)" maxlength="3">
-      </div>
+      <label>Lagerplats</label>
+      <input type="text" id="add-location" placeholder="t.ex. A-1-01" autocomplete="off" value="${prefill.location ? escapeHtml(prefill.location) : ''}">
+      <div class="help">Format: Zon-Hylla-Plats · scanna platsetikett eller skriv</div>
     </div>
     <div class="field">
       <label>Antal</label>
       <input type="number" id="add-qty" min="1" step="1" value="1">
     </div>
+    <div class="field" style="margin-bottom:0;">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;text-transform:none;letter-spacing:0;font-size:13px;color:var(--text);">
+        <input type="checkbox" id="add-keepopen" ${prefill.keepOpen !== false ? 'checked' : ''} style="width:auto;">
+        Fortsätt lägga till efter sparande (behåller lagerplats)
+      </label>
+    </div>
   `;
-  openModal('Lägg till artikel på lager', html, async () => {
+  const submit = async () => {
     const code = document.getElementById('add-code').value.trim();
-    const zone = document.getElementById('add-zone').value.trim().toUpperCase();
-    const shelf = document.getElementById('add-shelf').value.trim().toUpperCase();
-    const bin = document.getElementById('add-bin').value.trim().toUpperCase();
+    const locationStr = document.getElementById('add-location').value;
+    const location = parseLocation(locationStr);
     const qty = parseInt(document.getElementById('add-qty').value);
-    if (!code) { toast('Materialkod saknas', 'error'); return; }
-    if (!zone || !shelf || !bin) { toast('Lagerplats måste anges', 'error'); return; }
+    const keepOpen = document.getElementById('add-keepopen').checked;
+    if (!code) { toast('Materialkod saknas', 'error'); document.getElementById('add-code').focus(); return; }
+    if (!location) { toast('Lagerplats ogiltig — format Zon-Hylla-Plats', 'error'); document.getElementById('add-location').focus(); return; }
     if (!qty || qty < 1) { toast('Antal måste vara minst 1', 'error'); return; }
     const article = findArticle(code);
     if (!article) {
-      if (!confirm(`Materialkoden "${code}" finns inte i artikellistan. Lägg till ändå som okänd artikel?`)) return;
+      if (!confirm(`Materialkoden "${code}" finns inte i artikellistan. Lägg till ändå som okänd artikel?`)) {
+        document.getElementById('add-code').focus(); document.getElementById('add-code').select();
+        return;
+      }
     }
-    const location = {zone, shelf, bin};
     const existing = stockData.find(s => s.code === code && formatLocation(s.location) === formatLocation(location));
     await withSync(async () => {
       if (existing) {
@@ -703,8 +757,14 @@ function openAddDialog() {
         await postHistory({type:'add', code, name: item.name, location: formatLocation(location), qty, note: 'Ny lagerpost'});
       }
     }, `Lade till ${qty} st ${code}`);
-    closeModal();
-  }, 'Lägg till');
+    if (keepOpen) {
+      // Öppna en ny tom rad direkt, behåll lagerplatsen → minimalt klickande
+      openAddDialog({ location: locationStr.trim(), keepOpen: true });
+    } else {
+      closeModal();
+    }
+  };
+  openModal('Lägg till artikel på lager', html, submit, 'Lägg till');
 
   setTimeout(() => {
     const inp = document.getElementById('add-code');
@@ -715,6 +775,9 @@ function openAddDialog() {
       const a = findArticle(inp.value.trim());
       document.getElementById('add-name-display').textContent = a ? (a.name + ' · ' + formatPrice(a.price)) : 'Okänd materialkod';
     });
+    enableFieldFlow(['add-code', 'add-location', 'add-qty'], submit);
+    // Om lagerplats redan ifylld (fortsätt-läge): börja direkt på materialkod ändå,
+    // eftersom platsen oftast är samma och koden är det som ändras
     inp.focus();
   }, 50);
 }
@@ -732,7 +795,7 @@ function openRemoveDialog(stockId=null) {
     <div class="field"><label>Antal att ta bort</label><input type="number" id="rm-qty" min="1" step="1" value="1"></div>
     <div class="field"><label>Anledning (valfritt)</label><input type="text" id="rm-note" placeholder="t.ex. Uttag till verkstad..."></div>
   `;
-  openModal('Ta bort från lager', html, async () => {
+  const submit = async () => {
     const id = document.getElementById('rm-id').value;
     const qty = parseInt(document.getElementById('rm-qty').value);
     const note = document.getElementById('rm-note').value.trim();
@@ -747,7 +810,9 @@ function openRemoveDialog(stockId=null) {
       await postHistory({type:'remove', code: s.code, name: s.name, location: formatLocation(s.location), qty: -qty, note: note || 'Uttag'});
     }, `Tog bort ${qty} st ${s.code}`);
     closeModal();
-  }, 'Ta bort');
+  };
+  openModal('Ta bort från lager', html, submit, 'Ta bort');
+  setTimeout(() => enableFieldFlow(['rm-id', 'rm-qty', 'rm-note'], submit), 50);
 }
 
 function openMoveDialog(stockId=null) {
@@ -763,24 +828,18 @@ function openMoveDialog(stockId=null) {
     <div class="field"><label>Antal att flytta</label><input type="number" id="mv-qty" min="1" step="1" value="${selected ? selected.qty : 1}"></div>
     <div class="field">
       <label>Ny lagerplats</label>
-      <div class="field-row">
-        <input type="text" id="mv-zone" placeholder="Zon" maxlength="3">
-        <input type="text" id="mv-shelf" placeholder="Hylla" maxlength="3">
-        <input type="text" id="mv-bin" placeholder="Plats" maxlength="3">
-      </div>
+      <input type="text" id="mv-location" placeholder="t.ex. A-1-01" autocomplete="off">
+      <div class="help">Format: Zon-Hylla-Plats</div>
     </div>
   `;
-  openModal('Flytta lagerplats', html, async () => {
+  const submit = async () => {
     const id = document.getElementById('mv-id').value;
     const qty = parseInt(document.getElementById('mv-qty').value);
-    const zone = document.getElementById('mv-zone').value.trim().toUpperCase();
-    const shelf = document.getElementById('mv-shelf').value.trim().toUpperCase();
-    const bin = document.getElementById('mv-bin').value.trim().toUpperCase();
+    const newLoc = parseLocation(document.getElementById('mv-location').value);
     const s = stockData.find(x => x.id === id);
     if (!s) return;
-    if (!zone || !shelf || !bin) { toast('Ange ny lagerplats', 'error'); return; }
+    if (!newLoc) { toast('Lagerplats ogiltig — använd format Zon-Hylla-Plats', 'error'); return; }
     if (qty < 1 || qty > s.qty) { toast(`Ogiltigt antal (1-${s.qty})`, 'error'); return; }
-    const newLoc = {zone, shelf, bin};
     const oldLocStr = formatLocation(s.location);
     if (formatLocation(newLoc) === oldLocStr) { toast('Samma plats', 'warning'); return; }
     const target = stockData.find(x => x.code === s.code && formatLocation(x.location) === formatLocation(newLoc));
@@ -798,7 +857,9 @@ function openMoveDialog(stockId=null) {
       await postHistory({type:'move', code: s.code, name: s.name, location: `${oldLocStr} → ${formatLocation(newLoc)}`, qty, note: `Flyttat ${qty} st`});
     }, `Flyttade ${qty} st ${s.code}`);
     closeModal();
-  }, 'Flytta');
+  };
+  openModal('Flytta lagerplats', html, submit, 'Flytta');
+  setTimeout(() => enableFieldFlow(['mv-id', 'mv-qty', 'mv-location'], submit), 50);
 }
 
 function openAdjustDialog(stockId=null) {
@@ -814,7 +875,7 @@ function openAdjustDialog(stockId=null) {
     <div class="field"><label>Inventerat antal (nytt saldo)</label><input type="number" id="adj-qty" min="0" step="1" value="${selected ? selected.qty : 0}"></div>
     <div class="field"><label>Anledning</label><input type="text" id="adj-note" placeholder="t.ex. Inventering..."></div>
   `;
-  openModal('Justera antal (inventering)', html, async () => {
+  const submit = async () => {
     const id = document.getElementById('adj-id').value;
     const newQty = parseInt(document.getElementById('adj-qty').value);
     const note = document.getElementById('adj-note').value.trim();
@@ -828,7 +889,9 @@ function openAdjustDialog(stockId=null) {
       await postHistory({type:'adjust', code: s.code, name: s.name, location: formatLocation(s.location), qty: diff, note: `${note || 'Inventering'}: ${s.qty} → ${newQty}`});
     }, `Justerade ${s.code} till ${newQty} st`);
     closeModal();
-  }, 'Spara');
+  };
+  openModal('Justera antal (inventering)', html, submit, 'Spara');
+  setTimeout(() => enableFieldFlow(['adj-id', 'adj-qty', 'adj-note'], submit), 50);
 }
 
 function quickPrintLabel(id) {
@@ -956,38 +1019,34 @@ document.getElementById('btn-add-manual-label').addEventListener('click', () => 
     </div>
     <div class="field">
       <label>Lagerplats</label>
-      <div class="field-row">
-        <input type="text" id="ml-zone" placeholder="Zon">
-        <input type="text" id="ml-shelf" placeholder="Hylla">
-        <input type="text" id="ml-bin" placeholder="Plats">
-      </div>
+      <input type="text" id="ml-location" placeholder="t.ex. A-1-01" autocomplete="off">
     </div>
     <div class="field"><label>Antal etiketter</label><input type="number" id="ml-count" value="1" min="1" max="50"></div>
   `;
-  openModal('Lägg till artikeletikett manuellt', html, () => {
+  const submit = () => {
     const code = document.getElementById('ml-code').value.trim();
-    const zone = document.getElementById('ml-zone').value.trim().toUpperCase();
-    const shelf = document.getElementById('ml-shelf').value.trim().toUpperCase();
-    const bin = document.getElementById('ml-bin').value.trim().toUpperCase();
+    const loc = parseLocation(document.getElementById('ml-location').value);
     const count = parseInt(document.getElementById('ml-count').value);
-    if (!code || !zone || !shelf || !bin || count < 1) { toast('Fyll i alla fält', 'error'); return; }
+    if (!code || !loc || count < 1) { toast('Fyll i alla fält (lagerplats: Zon-Hylla-Plats)', 'error'); return; }
     const article = findArticle(code);
     labelQueue.push({
       kind: 'article',
       code, name: article ? article.name : '(okänd)',
-      location: `${zone}-${shelf}-${bin}`,
+      location: formatLocation(loc),
       price: article ? article.price : 0,
       count
     });
     renderLabelSource();
     renderLocationLabelSource();
     closeModal();
-  }, 'Lägg till');
+  };
+  openModal('Lägg till artikeletikett manuellt', html, submit, 'Lägg till');
   setTimeout(() => {
     const inp = document.getElementById('ml-code');
     articleAutocomplete(inp, a => {
       document.getElementById('ml-name').textContent = a.name + ' · ' + formatPrice(a.price);
     });
+    enableFieldFlow(['ml-code', 'ml-location', 'ml-count'], submit);
     inp.focus();
   }, 50);
 });
@@ -1082,30 +1141,155 @@ document.getElementById('btn-select-all-loclabels').addEventListener('click', ()
 document.getElementById('btn-add-location-label').addEventListener('click', () => {
   const html = `
     <div class="field">
-      <label>Lagerplats (Zon - Hylla - Plats)</label>
-      <div class="field-row">
-        <input type="text" id="lml-zone" placeholder="Zon" maxlength="3">
-        <input type="text" id="lml-shelf" placeholder="Hylla" maxlength="3">
-        <input type="text" id="lml-bin" placeholder="Plats" maxlength="3">
+      <label>Läge</label>
+      <select id="lml-mode">
+        <option value="single">Enskild lagerplats</option>
+        <option value="series">Serie (flera platser i rad)</option>
+      </select>
+    </div>
+
+    <div id="lml-single-block">
+      <div class="field">
+        <label>Lagerplats</label>
+        <input type="text" id="lml-location" placeholder="t.ex. A-1-01" autocomplete="off">
+        <div class="help">Format: Zon-Hylla-Plats</div>
+      </div>
+      <div class="field"><label>Antal etiketter</label><input type="number" id="lml-count" value="1" min="1" max="50"></div>
+    </div>
+
+    <div id="lml-series-block" style="display: none;">
+      <div class="field">
+        <label>Från-plats</label>
+        <input type="text" id="lml-from" placeholder="t.ex. A-1-01" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>Till-plats</label>
+        <input type="text" id="lml-to" placeholder="t.ex. A-1-10" autocomplete="off">
+        <div class="help">Endast en del får skilja sig åt (oftast plats-numret)</div>
+      </div>
+      <div id="lml-series-preview" style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-faint); padding: 8px; background: var(--bg); border: 1px solid var(--border); margin-bottom: 12px; min-height: 32px;">
+        Förhandsgranskning visas här
       </div>
     </div>
-    <div class="field"><label>Antal etiketter</label><input type="number" id="lml-count" value="1" min="1" max="50"></div>
   `;
-  openModal('Lägg till lagerplatsetikett manuellt', html, () => {
-    const zone = document.getElementById('lml-zone').value.trim().toUpperCase();
-    const shelf = document.getElementById('lml-shelf').value.trim().toUpperCase();
-    const bin = document.getElementById('lml-bin').value.trim().toUpperCase();
-    const count = parseInt(document.getElementById('lml-count').value);
-    if (!zone || !shelf || !bin || count < 1) { toast('Fyll i alla fält', 'error'); return; }
-    const loc = `${zone}-${shelf}-${bin}`;
-    const existing = labelQueue.find(q => q.kind === 'location' && q.location === loc);
-    if (existing) existing.count += count;
-    else labelQueue.push({ kind: 'location', location: loc, count });
-    renderLocationLabelSource();
-    closeModal();
+  openModal('Lägg till lagerplatsetiketter', html, () => {
+    const mode = document.getElementById('lml-mode').value;
+    if (mode === 'single') {
+      const loc = parseLocation(document.getElementById('lml-location').value);
+      const count = parseInt(document.getElementById('lml-count').value);
+      if (!loc || count < 1) { toast('Fyll i alla fält (format: Zon-Hylla-Plats)', 'error'); return; }
+      const locStr = formatLocation(loc);
+      const existing = labelQueue.find(q => q.kind === 'location' && q.location === locStr);
+      if (existing) existing.count += count;
+      else labelQueue.push({ kind: 'location', location: locStr, count });
+      renderLocationLabelSource();
+      closeModal();
+      toast(`Lade till etikett för ${locStr}`);
+    } else {
+      const fromLoc = parseLocation(document.getElementById('lml-from').value);
+      const toLoc = parseLocation(document.getElementById('lml-to').value);
+      if (!fromLoc || !toLoc) { toast('Använd format Zon-Hylla-Plats för både från och till', 'error'); return; }
+      const series = generateLocationSeries(fromLoc, toLoc);
+      if (!series) { toast('Kan inte generera serie — exakt ett av Zon/Hylla/Plats måste skilja sig åt', 'error'); return; }
+      if (series.length > 100) {
+        if (!confirm(`Detta skapar ${series.length} etiketter. Fortsätt?`)) return;
+      }
+      series.forEach(locStr => {
+        const existing = labelQueue.find(q => q.kind === 'location' && q.location === locStr);
+        if (existing) existing.count += 1;
+        else labelQueue.push({ kind: 'location', location: locStr, count: 1 });
+      });
+      renderLocationLabelSource();
+      closeModal();
+      toast(`Lade till ${series.length} etiketter`);
+    }
   }, 'Lägg till');
-  setTimeout(() => { document.getElementById('lml-zone').focus(); }, 50);
+
+  setTimeout(() => {
+    const modeSel = document.getElementById('lml-mode');
+    const singleBlock = document.getElementById('lml-single-block');
+    const seriesBlock = document.getElementById('lml-series-block');
+    const previewEl = document.getElementById('lml-series-preview');
+
+    modeSel.addEventListener('change', () => {
+      const isSeries = modeSel.value === 'series';
+      singleBlock.style.display = isSeries ? 'none' : 'block';
+      seriesBlock.style.display = isSeries ? 'block' : 'none';
+      if (isSeries) document.getElementById('lml-from').focus();
+      else document.getElementById('lml-location').focus();
+    });
+
+    function updateSeriesPreview() {
+      const fromLoc = parseLocation(document.getElementById('lml-from').value);
+      const toLoc = parseLocation(document.getElementById('lml-to').value);
+      if (!fromLoc || !toLoc) { previewEl.textContent = 'Fyll i båda fälten i format Zon-Hylla-Plats'; return; }
+      const series = generateLocationSeries(fromLoc, toLoc);
+      if (!series) { previewEl.textContent = 'Exakt ett segment (Zon/Hylla/Plats) får skilja sig åt'; return; }
+      if (series.length > 8) {
+        previewEl.textContent = `${series.length} etiketter: ${series.slice(0,3).join(', ')} … ${series.slice(-2).join(', ')}`;
+      } else {
+        previewEl.textContent = `${series.length} etiketter: ${series.join(', ')}`;
+      }
+    }
+    document.getElementById('lml-from').addEventListener('input', updateSeriesPreview);
+    document.getElementById('lml-to').addEventListener('input', updateSeriesPreview);
+
+    document.getElementById('lml-location').focus();
+  }, 50);
 });
+
+// Generera en serie av lagerplatser från en startplats till en slutplats.
+// Exakt ett av segmenten (zone/shelf/bin) måste skilja sig åt.
+// Stödjer numeriska serier (1, 2, 3...) och alfabetiska (A, B, C...).
+function generateLocationSeries(fromLoc, toLoc) {
+  const segments = ['zone', 'shelf', 'bin'];
+  const diffSegs = segments.filter(s => fromLoc[s] !== toLoc[s]);
+  if (diffSegs.length !== 1) return null;
+  const diff = diffSegs[0];
+  let fromVal = fromLoc[diff];
+  let toVal = toLoc[diff];
+
+  // Numerisk serie
+  if (/^\d+$/.test(fromVal) && /^\d+$/.test(toVal)) {
+    const pad = Math.max(fromVal.length, toVal.length);
+    let lo = parseInt(fromVal, 10);
+    let hi = parseInt(toVal, 10);
+    if (lo > hi) [lo, hi] = [hi, lo];
+    const out = [];
+    for (let i = lo; i <= hi; i++) {
+      const seg = String(i).padStart(pad, '0');
+      out.push(formatLocation({ ...fromLoc, [diff]: seg }));
+    }
+    return out;
+  }
+
+  // Alfabetisk serie (A, B, ... eller AA, AB, ...)
+  if (fromVal.length === toVal.length && /^[A-Z]+$/.test(fromVal) && /^[A-Z]+$/.test(toVal)) {
+    let a = fromVal, b = toVal;
+    if (a > b) [a, b] = [b, a];
+    const out = [];
+    let cur = a;
+    let safety = 0;
+    while (cur <= b && safety++ < 1000) {
+      out.push(formatLocation({ ...fromLoc, [diff]: cur }));
+      if (cur === b) break;
+      cur = incrementAlpha(cur);
+    }
+    return out;
+  }
+
+  return null;
+}
+
+function incrementAlpha(s) {
+  const chars = s.split('');
+  let i = chars.length - 1;
+  while (i >= 0) {
+    if (chars[i] === 'Z') { chars[i] = 'A'; i--; }
+    else { chars[i] = String.fromCharCode(chars[i].charCodeAt(0) + 1); return chars.join(''); }
+  }
+  return 'A' + chars.join('');
+}
 
 // Subflik-växling
 document.querySelectorAll('.label-subtab').forEach(btn => {
@@ -1134,26 +1318,23 @@ function previewLabels() {
     if (l.kind === 'location') {
       return `
         <div class="location-label">
-          <div class="ll-brand">EV-SPECIALISTEN · LAGERPLATS</div>
           <div class="ll-qr" id="qr-${idx}"></div>
-          <div class="ll-loc">${escapeHtml(l.location)}</div>
+          <div class="ll-loc" data-fit="location">${escapeHtml(l.location)}</div>
         </div>
       `;
     }
     return `
       <div class="label">
         <div class="label-header">
+          ${SURRON_LOGO_SVG}
           <div class="brand">EV-SPECIALISTEN</div>
-          <div class="loc">${escapeHtml(l.location)}</div>
         </div>
-        <div class="label-mid">
-          <div class="label-info">
-            <div class="code">${escapeHtml(l.code)}</div>
-            <div class="name">${escapeHtml(l.name)}</div>
-          </div>
-          <div class="label-qr" id="qr-${idx}"></div>
+        <div class="label-qr" id="qr-${idx}"></div>
+        <div class="label-info">
+          <div class="code" data-fit="code">${escapeHtml(l.code)}</div>
+          <div class="loc-line">${escapeHtml(l.location)}</div>
+          <div class="name" data-fit="name">${escapeHtml(l.name)}</div>
         </div>
-        <div class="label-barcode"><svg id="bc-${idx}"></svg></div>
       </div>
     `;
   }).join('');
@@ -1161,29 +1342,70 @@ function previewLabels() {
     const qrEl = document.getElementById('qr-' + idx);
     qrEl.innerHTML = '';
     try {
-      const qrText = l.kind === 'location'
-        ? JSON.stringify({type: 'location', l: l.location})
-        : JSON.stringify({c: l.code, l: l.location});
-      const qrSize = l.kind === 'location' ? 200 : 120;
+      const qrText = l.kind === 'location' ? l.location : l.code;
+      const qrSize = 160;
       new QRCode(qrEl, {
         text: qrText,
         width: qrSize, height: qrSize,
         correctLevel: QRCode.CorrectLevel.M
       });
     } catch(e) { console.error('QR fail', e); }
-    if (l.kind !== 'location') {
-      try {
-        JsBarcode('#bc-' + idx, l.code, { format: 'CODE128', displayValue: false, margin: 0, height: 30, width: 1.2 });
-      } catch(e) { console.error('Barcode fail for', l.code, e); }
-    }
+  });
+  // Anpassa textstorlek så den fyller bredden men inte svämmar över
+  requestAnimationFrame(() => {
+    preview.querySelectorAll('[data-fit]').forEach(el => fitText(el));
   });
   section.style.display = 'block';
   return labels.length;
 }
 
+// Skala upp textstorleken tills den nästan fyller containerns bredd
+function fitText(el) {
+  const parent = el.parentElement;
+  if (!parent) return;
+  const maxWidth = parent.clientWidth - 2;
+  const kind = el.dataset.fit; // 'location' | 'code' | 'name'
+  const cfg = {
+    location: { start: 10, max: 40 },
+    code:     { start: 8,  max: 20 },
+    name:     { start: 8,  max: 14 }
+  }[kind] || { start: 8, max: 20 };
+  let size = cfg.start;
+  el.style.fontSize = size + 'pt';
+  while (size < cfg.max && el.scrollWidth <= maxWidth) {
+    size += 0.5;
+    el.style.fontSize = size + 'pt';
+  }
+  while (size > 5 && el.scrollWidth > maxWidth) {
+    size -= 0.5;
+    el.style.fontSize = size + 'pt';
+  }
+}
+
 document.getElementById('btn-print-labels').addEventListener('click', () => {
   const n = previewLabels();
-  if (n) setTimeout(() => window.print(), 300);
+  if (!n) return;
+
+  // Räkna hur många av varje typ
+  const articleCount = labelQueue.filter(q => q.kind !== 'location').reduce((s,q) => s + q.count, 0);
+  const locationCount = labelQueue.filter(q => q.kind === 'location').reduce((s,q) => s + q.count, 0);
+
+  if (articleCount > 0 && locationCount > 0) {
+    toast('Skriv ut artikeletiketter och lagerplatsetiketter separat — de har olika sidstorlek', 'error');
+    return;
+  }
+
+  // Injicera rätt @page-regel dynamiskt
+  const pageSize = locationCount > 0 ? '102mm 17mm' : '60mm 60mm';
+  let styleEl = document.getElementById('dynamic-page-style');
+  if (!styleEl) {
+    styleEl = document.createElement('style');
+    styleEl.id = 'dynamic-page-style';
+    document.head.appendChild(styleEl);
+  }
+  styleEl.textContent = `@media print { @page { size: ${pageSize}; margin: 0; } }`;
+
+  setTimeout(() => window.print(), 300);
 });
 
 // ============ HISTORY ============
