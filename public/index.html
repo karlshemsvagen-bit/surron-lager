@@ -180,24 +180,31 @@ td.mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
 }
 .label-info .name { font-weight: 600; line-height: 1.1; white-space: nowrap; }
 
-/* Lagerplatsetikett 102x17mm liggande – QR vänster, stor text höger */
+/* Lagerplatsetikett – trycks på 60x60mm papper, innehållet fyller 58x22mm centrerat */
 .location-label {
-  width: 102mm; height: 17mm;
+  width: 60mm; height: 60mm;
   background: white; color: black;
   border: 1px solid #ccc;
-  padding: 1mm;
-  display: flex; flex-direction: row;
-  align-items: center; justify-content: flex-start;
-  gap: 2mm;
+  padding: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
   font-family: 'Space Grotesk', sans-serif;
   page-break-after: always;
   page-break-inside: avoid;
   overflow: hidden;
   box-sizing: border-box;
 }
+.location-label .ll-inner {
+  width: 58mm; height: 22mm;
+  display: flex; flex-direction: row;
+  align-items: center; justify-content: center;
+  gap: 2mm;
+  padding: 1mm;
+  box-sizing: border-box;
+}
 .location-label .ll-qr { flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
 .location-label .ll-qr canvas, .location-label .ll-qr img {
-  width: 15mm !important; height: 15mm !important; display: block;
+  width: 20mm !important; height: 20mm !important; display: block;
 }
 .location-label .ll-loc {
   font-family: 'JetBrains Mono', monospace;
@@ -207,7 +214,7 @@ td.mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
   text-align: center;
   white-space: nowrap;
   flex: 1; min-width: 0;
-  padding: 0 2mm;
+  padding: 0 1mm;
 }
 
 .print-toolbar { background: var(--panel); border: 1px solid var(--border); padding: 16px; margin-bottom: 20px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
@@ -1318,8 +1325,10 @@ function previewLabels() {
     if (l.kind === 'location') {
       return `
         <div class="location-label">
-          <div class="ll-qr" id="qr-${idx}"></div>
-          <div class="ll-loc" data-fit="location">${escapeHtml(l.location)}</div>
+          <div class="ll-inner">
+            <div class="ll-qr" id="qr-${idx}"></div>
+            <div class="ll-loc" data-fit="location">${escapeHtml(l.location)}</div>
+          </div>
         </div>
       `;
     }
@@ -1359,11 +1368,12 @@ function previewLabels() {
   return labels.length;
 }
 
-// Skala upp textstorleken tills den nästan fyller containerns bredd
+// Skala upp textstorleken tills den nästan fyller containerns bredd (och höjd om det finns)
 function fitText(el) {
   const parent = el.parentElement;
   if (!parent) return;
   const maxWidth = parent.clientWidth - 2;
+  const maxHeight = parent.clientHeight - 2;
   const kind = el.dataset.fit; // 'location' | 'code' | 'name'
   const cfg = {
     location: { start: 10, max: 40 },
@@ -1372,11 +1382,11 @@ function fitText(el) {
   }[kind] || { start: 8, max: 20 };
   let size = cfg.start;
   el.style.fontSize = size + 'pt';
-  while (size < cfg.max && el.scrollWidth <= maxWidth) {
+  while (size < cfg.max && el.scrollWidth <= maxWidth && el.scrollHeight <= maxHeight) {
     size += 0.5;
     el.style.fontSize = size + 'pt';
   }
-  while (size > 5 && el.scrollWidth > maxWidth) {
+  while (size > 5 && (el.scrollWidth > maxWidth || el.scrollHeight > maxHeight)) {
     size -= 0.5;
     el.style.fontSize = size + 'pt';
   }
@@ -1386,24 +1396,14 @@ document.getElementById('btn-print-labels').addEventListener('click', () => {
   const n = previewLabels();
   if (!n) return;
 
-  // Räkna hur många av varje typ
-  const articleCount = labelQueue.filter(q => q.kind !== 'location').reduce((s,q) => s + q.count, 0);
-  const locationCount = labelQueue.filter(q => q.kind === 'location').reduce((s,q) => s + q.count, 0);
-
-  if (articleCount > 0 && locationCount > 0) {
-    toast('Skriv ut artikeletiketter och lagerplatsetiketter separat — de har olika sidstorlek', 'error');
-    return;
-  }
-
-  // Injicera rätt @page-regel dynamiskt
-  const pageSize = locationCount > 0 ? '102mm 17mm' : '60mm 60mm';
+  // Båda etikettyper trycks på 60×60 mm papper
   let styleEl = document.getElementById('dynamic-page-style');
   if (!styleEl) {
     styleEl = document.createElement('style');
     styleEl.id = 'dynamic-page-style';
     document.head.appendChild(styleEl);
   }
-  styleEl.textContent = `@media print { @page { size: ${pageSize}; margin: 0; } }`;
+  styleEl.textContent = `@media print { @page { size: 60mm 60mm; margin: 0; } }`;
 
   setTimeout(() => window.print(), 300);
 });
