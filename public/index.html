@@ -132,7 +132,7 @@ td.mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
 .ac-item .ac-code { font-family: 'JetBrains Mono', monospace; color: var(--accent); font-size: 11px; }
 .ac-item .ac-name { color: var(--text-dim); display: block; margin-top: 2px; }
 
-.label-print-area { display: grid; grid-template-columns: repeat(auto-fill, 60mm); gap: 6mm; justify-content: center; }
+.label-print-area { display: flex; flex-wrap: wrap; gap: 6mm; justify-content: center; }
 
 /* Artikeletikett 60x60mm */
 .label {
@@ -180,14 +180,14 @@ td.mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
 }
 .label-info .name { font-weight: 600; line-height: 1.1; white-space: nowrap; }
 
-/* Lagerplatsetikett 60x60mm – maximal läsbar text */
+/* Lagerplatsetikett 102x17mm liggande – QR vänster, stor text höger */
 .location-label {
-  width: 60mm; height: 60mm;
+  width: 102mm; height: 17mm;
   background: white; color: black;
   border: 1px solid #ccc;
-  padding: 2.5mm;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
+  padding: 1mm;
+  display: flex; flex-direction: row;
+  align-items: center; justify-content: flex-start;
   gap: 2mm;
   font-family: 'Space Grotesk', sans-serif;
   page-break-after: always;
@@ -197,16 +197,17 @@ td.mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
 }
 .location-label .ll-qr { flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
 .location-label .ll-qr canvas, .location-label .ll-qr img {
-  width: 22mm !important; height: 22mm !important; display: block;
+  width: 15mm !important; height: 15mm !important; display: block;
 }
 .location-label .ll-loc {
   font-family: 'JetBrains Mono', monospace;
   font-weight: 700;
-  line-height: 1.05;
+  line-height: 1;
   color: #000;
   text-align: center;
   white-space: nowrap;
-  width: 100%;
+  flex: 1; min-width: 0;
+  padding: 0 2mm;
 }
 
 .print-toolbar { background: var(--panel); border: 1px solid var(--border); padding: 16px; margin-bottom: 20px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
@@ -231,7 +232,6 @@ td.mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
 .history-action { font-weight: 600; text-transform: uppercase; font-size: 10px; letter-spacing: 0.1em; }
 
 @media print {
-  @page { size: 60mm 60mm; margin: 0; }
   header, .toolbar, .print-toolbar, .toast-container { display: none !important; }
   body { background: white; margin: 0; padding: 0; }
   main { padding: 0; max-width: none; }
@@ -1384,7 +1384,28 @@ function fitText(el) {
 
 document.getElementById('btn-print-labels').addEventListener('click', () => {
   const n = previewLabels();
-  if (n) setTimeout(() => window.print(), 300);
+  if (!n) return;
+
+  // Räkna hur många av varje typ
+  const articleCount = labelQueue.filter(q => q.kind !== 'location').reduce((s,q) => s + q.count, 0);
+  const locationCount = labelQueue.filter(q => q.kind === 'location').reduce((s,q) => s + q.count, 0);
+
+  if (articleCount > 0 && locationCount > 0) {
+    toast('Skriv ut artikeletiketter och lagerplatsetiketter separat — de har olika sidstorlek', 'error');
+    return;
+  }
+
+  // Injicera rätt @page-regel dynamiskt
+  const pageSize = locationCount > 0 ? '102mm 17mm' : '60mm 60mm';
+  let styleEl = document.getElementById('dynamic-page-style');
+  if (!styleEl) {
+    styleEl = document.createElement('style');
+    styleEl.id = 'dynamic-page-style';
+    document.head.appendChild(styleEl);
+  }
+  styleEl.textContent = `@media print { @page { size: ${pageSize}; margin: 0; } }`;
+
+  setTimeout(() => window.print(), 300);
 });
 
 // ============ HISTORY ============
