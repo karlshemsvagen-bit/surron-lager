@@ -180,7 +180,7 @@ td.mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
 }
 .label-info .name { font-weight: 600; line-height: 1.1; white-space: nowrap; }
 
-/* Lagerplatsetikett – trycks på 60x60mm papper, innehållet fyller 58x22mm centrerat */
+/* Lagerplatsetikett – trycks på 60x60mm papper, innehållet fyller 22mm hög rad centrerat */
 .location-label {
   width: 60mm; height: 60mm;
   background: white; color: black;
@@ -199,22 +199,24 @@ td.mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
   display: flex; flex-direction: row;
   align-items: center; justify-content: center;
   gap: 2mm;
-  padding: 1mm;
   box-sizing: border-box;
 }
-.location-label .ll-qr { flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.location-label .ll-qr {
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  width: 22mm; height: 22mm;
+}
 .location-label .ll-qr canvas, .location-label .ll-qr img {
-  width: 20mm !important; height: 20mm !important; display: block;
+  width: 22mm !important; height: 22mm !important; display: block;
 }
 .location-label .ll-loc {
   font-family: 'JetBrains Mono', monospace;
   font-weight: 700;
   line-height: 1;
   color: #000;
-  text-align: center;
+  text-align: left;
   white-space: nowrap;
-  flex: 1; min-width: 0;
-  padding: 0 1mm;
+  flex: 0 0 auto;
 }
 
 .print-toolbar { background: var(--panel); border: 1px solid var(--border); padding: 16px; margin-bottom: 20px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
