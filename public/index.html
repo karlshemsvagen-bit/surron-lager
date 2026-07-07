@@ -180,7 +180,7 @@ td.mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
 }
 .label-info .name { font-weight: 600; line-height: 1.1; white-space: nowrap; }
 
-/* Lagerplatsetikett – trycks på 60x60mm papper, innehållet fyller 22mm hög rad centrerat */
+/* Lagerplatsetikett – trycks på 60x60mm papper, innehållet fyller 18mm hög rad centrerat */
 .location-label {
   width: 60mm; height: 60mm;
   background: white; color: black;
@@ -195,19 +195,19 @@ td.mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
   box-sizing: border-box;
 }
 .location-label .ll-inner {
-  width: 58mm; height: 22mm;
+  width: 58mm; height: 18mm;
   display: flex; flex-direction: row;
   align-items: center; justify-content: center;
-  gap: 2mm;
+  gap: 1.5mm;
   box-sizing: border-box;
 }
 .location-label .ll-qr {
   flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
-  width: 22mm; height: 22mm;
+  width: 18mm; height: 18mm;
 }
 .location-label .ll-qr canvas, .location-label .ll-qr img {
-  width: 22mm !important; height: 22mm !important; display: block;
+  width: 18mm !important; height: 18mm !important; display: block;
 }
 .location-label .ll-loc {
   font-family: 'JetBrains Mono', monospace;
@@ -216,7 +216,10 @@ td.mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
   color: #000;
   text-align: left;
   white-space: nowrap;
-  flex: 0 0 auto;
+  flex: 1 1 0;
+  min-width: 0;
+  width: 100%;
+  overflow: hidden;
 }
 
 .print-toolbar { background: var(--panel); border: 1px solid var(--border); padding: 16px; margin-bottom: 20px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
@@ -1374,24 +1377,40 @@ function previewLabels() {
 function fitText(el) {
   const parent = el.parentElement;
   if (!parent) return;
-  const maxWidth = parent.clientWidth - 2;
-  const maxHeight = parent.clientHeight - 2;
   const kind = el.dataset.fit; // 'location' | 'code' | 'name'
   const cfg = {
     location: { start: 10, max: 40 },
     code:     { start: 8,  max: 20 },
     name:     { start: 8,  max: 14 }
   }[kind] || { start: 8, max: 20 };
+  const availWidth = el.clientWidth - 2;
+  const availHeight = parent.clientHeight - 2;
+  if (availWidth < 5) return;
+
+  // Använd canvas för att mäta faktisk textbredd (scrollWidth är opålitlig när
+  // elementet expanderar för att fylla sitt flex-utrymme)
+  const cs = getComputedStyle(el);
+  const ff = cs.fontFamily;
+  const fw = cs.fontWeight;
+  const text = el.textContent;
+  const canvas = fitText._canvas || (fitText._canvas = document.createElement('canvas'));
+  const ctx = canvas.getContext('2d');
+
+  // Höjd i px vid en viss pt-storlek (1pt ≈ 1.333px)
+  const ptToPx = 1.3333;
+
   let size = cfg.start;
-  el.style.fontSize = size + 'pt';
-  while (size < cfg.max && el.scrollWidth <= maxWidth && el.scrollHeight <= maxHeight) {
+  // Öka storleken så länge texten får plats både i bredd och höjd
+  while (size < cfg.max) {
+    ctx.font = `${fw} ${size}pt ${ff}`;
+    const textW = ctx.measureText(text).width;
+    const textH = size * ptToPx; // line-height 1
+    if (textW > availWidth || textH > availHeight) break;
     size += 0.5;
-    el.style.fontSize = size + 'pt';
   }
-  while (size > 5 && (el.scrollWidth > maxWidth || el.scrollHeight > maxHeight)) {
-    size -= 0.5;
-    el.style.fontSize = size + 'pt';
-  }
+  // Backa ett halvt steg för säkerhet
+  size = Math.max(4, size - 0.5);
+  el.style.fontSize = size + 'pt';
 }
 
 document.getElementById('btn-print-labels').addEventListener('click', () => {
